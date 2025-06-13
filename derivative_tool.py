@@ -35,11 +35,109 @@ class DerivativeVisitor(ast.NodeVisitor):
         return name ,args, right
     
 
+    #def visit_BinOp(self, node):
+    #    if isinstance(node.op, ast.Add):
+    #        self.visit(node.left)
+    #        self.visit(node.right)
+
+
+   #     elif isinstance(node.op, ast.Sub):
+   #         left_visitor = DerivativeVisitor.__new__(DerivativeVisitor)
+   #         left_visitor.diff_var = self.diff_var
+   #         left_visitor.terms = []
+   #         left_visitor.visit(node.left)
+   #         left_expr = " + ".join(left_visitor.terms) if left_visitor.terms else "0"
+
+   #         right_visitor = DerivativeVisitor.__new__(DerivativeVisitor)
+   #         right_visitor.diff_var = self.diff_var
+   #         right_visitor.terms = []
+   #         right_visitor.visit(node.right)
+   #         right_expr = " + ".join(right_visitor.terms) if right_visitor.terms else "0"
+
+   #         self.terms.append(f"({left_expr}) - ({right_expr})")
+
+
+   #     elif isinstance(node.op, ast.Pow):
+   #         if isinstance(node.left, ast.Name) and isinstance(node.right, ast.Constant):
+   #             var = node.left.id
+   #             exp = node.right.value
+   #             if var == self.diff_var:
+   #                 if exp - 1 == 0:
+   #                     self.terms.append(f"{exp}")
+   #                 else:
+   #                     self.terms.append(f"{exp}*{var}**{exp - 1}")
+   #             else:
+   #                 self.terms.append("0")  # ← this was missing!
+
+        
+
+   #     elif isinstance(node.op, ast.Div):
+   #         u = ast.unparse(node.left)
+   #         v = ast.unparse(node.right)
+
+   #         du = DerivativeVisitor.__new__(DerivativeVisitor)
+   #         du.diff_var = self.diff_var
+   #         du.terms = []
+   #         du.visit(node.left)
+   #         du_term = " + ".join(du.terms) if du.terms else "0"
+
+   #         dv = DerivativeVisitor.__new__(DerivativeVisitor)
+   #         dv.diff_var = self.diff_var
+   #         dv.terms = []
+   #         dv.visit(node.right)
+   #         dv_term = " + ".join(dv.terms) if dv.terms else "0"
+
+   #         numerator = f"{v}*({du_term}) - {u}*({dv_term})"
+   #         denominator = f"{v}**2"
+   #         self.terms.append(f"({numerator})/({denominator})")
+
+   #     elif isinstance(node.op, ast.FloorDiv):
+   #         print("⚠️  Floor division (//) is not differentiable. Returning 0.")
+   #         self.terms.append("0")
+
+   #     elif isinstance(node.op, ast.Mod):
+   #         print("⚠️  Modulo (%) is not differentiable in symbolic math. Returning 0.")
+   #         self.terms.append("0")
+
+   #    elif isinstance(node.op, ast.Mult):
+   #         left = node.left
+   #         right = node.right
+
+   #         # Check whether either side contains the variable
+   #         u = ast.unparse(left)
+   #         v = ast.unparse(right)
+
+            # Differentiate both sides
+   #         du = DerivativeVisitor.__new__(DerivativeVisitor)
+   #         du.diff_var = self.diff_var
+   #         du.terms = []
+   #         du.visit(left)
+   #         du_term = " + ".join(du.terms) if du.terms else "0"
+
+   #         dv = DerivativeVisitor.__new__(DerivativeVisitor)
+   #         dv.diff_var = self.diff_var
+   #         dv.terms = []
+   #         dv.visit(right)
+   #         dv_term = " + ".join(dv.terms) if dv.terms else "0"
+
+            # Only apply product rule if BOTH terms involve diff_var
+   #         if du_term != "0" and dv_term != "0":
+   #             left_term = f"({du_term})*{v}" if du_term != "0" else ""
+   #             right_term = f"{u}*({dv_term})" if dv_term != "0" else ""
+   #             combined = " + ".join(filter(None, [left_term, right_term]))
+   #             self.terms.append(combined if combined else "0")
+   #         elif du_term != "0":
+   #             self.terms.append(f"{du_term}*{v}")
+   #         elif dv_term != "0":
+   #             self.terms.append(f"{u}*{dv_term}")
+   #         else:
+   #             self.terms.append("0")
+
+        
     def visit_BinOp(self, node):
         if isinstance(node.op, ast.Add):
             self.visit(node.left)
             self.visit(node.right)
-
 
         elif isinstance(node.op, ast.Sub):
             left_visitor = DerivativeVisitor.__new__(DerivativeVisitor)
@@ -56,20 +154,30 @@ class DerivativeVisitor(ast.NodeVisitor):
 
             self.terms.append(f"({left_expr}) - ({right_expr})")
 
-
         elif isinstance(node.op, ast.Pow):
-            if isinstance(node.left, ast.Name) and isinstance(node.right, ast.Constant):
-                var = node.left.id
-                exp = node.right.value
-                if var == self.diff_var:
-                    if exp - 1 == 0:
-                        self.terms.append(f"{exp}")
-                    else:
-                        self.terms.append(f"{exp}*{var}**{exp - 1}")
-                else:
-                    self.terms.append("0")  # ← this was missing!
+            base = node.left
+            exponent = node.right
 
-        
+            base_expr = ast.unparse(base)
+            exponent_expr = ast.unparse(exponent)
+
+            # Get derivative of base
+            base_visitor = DerivativeVisitor.__new__(DerivativeVisitor)
+            base_visitor.diff_var = self.diff_var
+            base_visitor.terms = []
+            base_visitor.visit(base)
+            base_deriv = " + ".join(base_visitor.terms) if base_visitor.terms else "0"
+
+            # If exponent is constant, use chain rule
+            if isinstance(exponent, ast.Constant) and base_deriv != "0":
+                n = exponent.value
+                self.terms.append(f"{n}*({base_expr})**({n - 1})*({base_deriv})")
+            elif base_deriv == "0":
+                self.terms.append("0")
+            else:
+                # Symbolic exponent (e.g., x**y) not supported
+                print("⚠️  Exponentiation with symbolic exponent not fully supported.")
+                self.terms.append("0")
 
         elif isinstance(node.op, ast.Div):
             u = ast.unparse(node.left)
@@ -103,11 +211,9 @@ class DerivativeVisitor(ast.NodeVisitor):
             left = node.left
             right = node.right
 
-            # Check whether either side contains the variable
             u = ast.unparse(left)
             v = ast.unparse(right)
 
-            # Differentiate both sides
             du = DerivativeVisitor.__new__(DerivativeVisitor)
             du.diff_var = self.diff_var
             du.terms = []
@@ -120,7 +226,6 @@ class DerivativeVisitor(ast.NodeVisitor):
             dv.visit(right)
             dv_term = " + ".join(dv.terms) if dv.terms else "0"
 
-            # Only apply product rule if BOTH terms involve diff_var
             if du_term != "0" and dv_term != "0":
                 left_term = f"({du_term})*{v}" if du_term != "0" else ""
                 right_term = f"{u}*({dv_term})" if dv_term != "0" else ""
@@ -133,7 +238,6 @@ class DerivativeVisitor(ast.NodeVisitor):
             else:
                 self.terms.append("0")
 
-        
         
 
     def visit_Name(self, node):
@@ -373,7 +477,7 @@ class DerivativeVisitor(ast.NodeVisitor):
                 print(f"{delta:10.6f} | {approx:30.10f}")
             except Exception as e:
                 print(f"{delta:10.6f} | ❌ Error: {e}")
-
+ 
 
     def evaluate_both_differences(self, symbolic_value, var, context, deltas):
 
