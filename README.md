@@ -140,7 +140,7 @@ Symbolic-Derivative-Tool/
 ├── differentiator.py       # Core differentiation logic, gradient computation, and Jackson derivatives
 ├── entropy.py              # Entropy calculation functions (Shannon, Renyi, Tsallis)
 ├── parser.py               # Function parsing utilities
-├── tests/                  # Unit tests (local only, not in repository)
+├── tests/                  # Unit tests
 │   ├── test_parser.py
 │   ├── test_differentiator.py
 │   ├── test_entropy.py
