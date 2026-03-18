@@ -2,16 +2,17 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A Python-based symbolic differentiation and analysis tool using Python's built-in AST. It supports:
+A Python-based symbolic differentiation tool using Python's built-in AST. It computes symbolic derivatives of mathematical expressions and supports optimization with constraints using the Lagrange multiplier method, entropy calculations, and Jackson q-derivatives.
 
-- ✅ Symbolic Derivatives
-- ✅ Gradient and Hessian computation
-- ✅ Limit-based and numerical approximation (Forward & Central Difference)
-- ✅ Laplacian Operator
-- ✅ Taylor Series Expansion (multivariate)
-- ✅ Directional Derivatives
-- ✅ Symbolic Chain Rule Expansion
-- ✅ Jacobian Matrix for multivariable functions
+- ✅ Pure Symbolic Differentiation
+- ✅ Support for basic arithmetic operations (+, -, *, /, **)
+- ✅ Trigonometric functions (sin, cos, etc.)
+- ✅ Exponential and logarithmic functions
+- ✅ Chain rule, product rule, quotient rule, power rule
+- ✅ Pretty-printed output with superscripts
+- ✅ **Lagrange Multiplier Method** for constrained optimization
+- ✅ **Shannon, Renyi, and Tsallis Entropy** calculations
+- ✅ **Jackson q-Derivative** for quantum calculus
 
 ---
 
@@ -32,48 +33,101 @@ pip install -r requirements.txt
 
 3. **🚀 Usage**
 ```bash
-python derivative_tool.py
+python main.py
 ```
-You'll be prompted to enter a function and then choose from a list of operations.
+You'll be prompted to choose between symbolic differentiation, Lagrange multiplier method, and advanced mathematical computations.
 
 ---
 
 ## 🧪 Usage Examples
 
-### Example 1: Univariate Function
+### Example 1: Simple polynomial derivative
 ```text
-Enter a function: f(x) = sin(x**2 + 3*x)
-Differentiate with respect to: x
-Enter values for variables (e.g. x=2): x=1
+Choose an operation:
+1. Symbolic Differentiation
+2. Lagrange Multiplier Method
+3. Advanced Mathematical Computations
+> 1
+
+Choose differentiation type:
+1. Standard derivative
+2. Jackson q-derivative
+> 1
+
+Function: f(x) = x**2 + 3*x
+Variable to differentiate with respect to: x
+📘 Symbolic derivative: 2x + 3
 ```
 
-### Example 2: Multivariate Function
+### Example 2: Jackson q-Derivative
 ```text
-Enter a function: f(x, y) = x**2 + y**2
-Differentiate with respect to: x
-Enter values for variables (e.g. x=1, y=2): x=1, y=2
+Choose differentiation type:
+1. Standard derivative
+2. Jackson q-derivative
+> 2
+
+Function: f(x) = x**2
+q parameter: 2
+Variable to differentiate with respect to: x
+📘 Jackson q-derivative (q=2): 3x
+```
+
+### Example 3: Lagrange Multiplier Method
+```text
+Choose an operation:
+1. Symbolic Differentiation
+2. Lagrange Multiplier Method
+3. Advanced Mathematical Computations
+> 2
+
+Objective function f: x**2 + y**2
+Constraint function g: x + y
+📘 Variables: x, y
+
+📘 Lagrange Equations:
+∇f = λ ∇g
+∂f/∂x = λ ∂g/∂x
+2x = λ 1
+∂f/∂y = λ ∂g/∂y
+2y = λ 1
+
+📘 Constraint:
+g(x,y,...) = c
+x + y = c
+```
+
+### Example 4: Shannon Entropy
+```text
+Choose an operation:
+1. Symbolic Differentiation
+2. Lagrange Multiplier Method
+3. Advanced Mathematical Computations
+> 3
+
+Choose computation:
+1. Shannon Entropy
+2. Renyi Entropy
+3. Tsallis Entropy
+> 1
+
+Probabilities: 0.5, 0.3, 0.2
+📘 Shannon Entropy: 1.4855 bits
+```
+```text
+Function: sin(x)
+Variable to differentiate with respect to: x
+📘 Symbolic derivative: cosx
 ```
 
 ---
 
-## 📘 Features Menu
+## 🧪 Testing
 
-After entering the function and point, you'll see:
+Run the unit tests to validate the functionality:
 
-```text
-🧪 Select an operation to perform:
-1. Compare Derivative Approximations (Limit-based)
-2. Compute Gradient
-3. Compare Gradient with Numerical Derivatives
-4. Compute Hessian Matrix
-5. Compute Laplacian
-6. Taylor Series
-7. Compute Directional Derivative
-8. Symbolic Chain Rule Expansion
-9. Exit
+```bash
+python -m pytest tests/ -v
 ```
-
-Choose a number to run that operation.
 
 ---
 
@@ -81,10 +135,19 @@ Choose a number to run that operation.
 
 ```
 Symbolic-Derivative-Tool/
-├── derivative_tool.py
+├── main.py                 # Entry point
+├── cli.py                  # Command-line interface with menu options
+├── differentiator.py       # Core differentiation logic, gradient computation, and Jackson derivatives
+├── entropy.py              # Entropy calculation functions (Shannon, Renyi, Tsallis)
+├── parser.py               # Function parsing utilities
+├── tests/                  # Unit tests
+│   ├── test_parser.py
+│   ├── test_differentiator.py
+│   ├── test_entropy.py
+│   └── test_cli.py
 ├── README.md
-├── .gitignore
-└── requirements.txt
+├── requirements.txt
+└── LICENCE
 ```
 
 ---
@@ -97,4 +160,4 @@ Built with ❤️ and symbolic brainpower by Hincal Topcuoglu.
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENCE).
